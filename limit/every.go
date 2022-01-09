@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"LargeScale/micro/log"
+	"github.com/corex-io/micro/log"
 )
 
 var StopErr = errors.New("stop limit.Every")

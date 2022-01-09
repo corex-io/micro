@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"LargeScale/micro/log"
+	"github.com/corex-io/micro/log"
 )
 
 // Limit limit

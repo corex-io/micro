@@ -7,8 +7,7 @@ import (
 	"os"
 	"time"
 
-	"LargeScale/micro/log"
-
+	"github.com/corex-io/micro/log"
 
 	"go.etcd.io/bbolt"
 )

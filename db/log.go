@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"time"
 
-	"LargeScale/micro/log"
+	"github.com/corex-io/micro/log"
 
 	gormLogger "gorm.io/gorm/logger"
 )
