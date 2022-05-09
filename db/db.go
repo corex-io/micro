@@ -54,9 +54,10 @@ func (my *DB) Close() error {
 }
 
 // DB db
-func (my *DB) DB() *gorm.DB {
-	return my.db.WithContext(context.Background())
+func (my *DB) DB(ctx context.Context) *gorm.DB {
+	return my.db.WithContext(ctx)
 }
+
 // SetMaxOpenConns SetMaxOpenConns
 func (my *DB) SetMaxOpenConns(max int) error {
 	db, err := my.db.DB()

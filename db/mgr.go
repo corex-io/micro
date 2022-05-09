@@ -1,7 +1,9 @@
 package db
 
 import (
+	"context"
 	"fmt"
+	"gorm.io/gorm"
 	"sync"
 )
 
@@ -31,7 +33,7 @@ func (mgr *dbmgr) Load(configs ...Config) error {
 		if err != nil {
 			return err
 		}
-		if err:=db.SetMaxOpenConns(200); err != nil {
+		if err := db.SetMaxOpenConns(200); err != nil {
 			return err
 		}
 		mgr.dbs[config.UUID] = db
@@ -67,6 +69,11 @@ func Load(config Config) error {
 // Get Get
 func Get(uuid string) *DB {
 	return mgr.Get(uuid)
+}
+
+// GetDB GetDB
+func GetDB(ctx context.Context, uuid string) *gorm.DB {
+	return mgr.Get(uuid).DB(ctx)
 }
 
 // Close close
