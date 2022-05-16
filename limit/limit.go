@@ -68,3 +68,8 @@ func (limit *Limit) TryGo(key string, fc func() error) {
 func (limit *Limit) Wait() {
 	limit.wg.Wait()
 }
+
+// Len len
+func (limit *Limit) Len() int {
+	return len(limit.ch)
+}
