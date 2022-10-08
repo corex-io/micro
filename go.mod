@@ -1,11 +1,11 @@
 module github.com/corex-io/micro
 
-go 1.17
+go 1.18
 
 require (
 	github.com/corex-io/codec v0.0.0-20210617135354-fa3f3c955862
 	go.etcd.io/bbolt v1.3.6
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/sync v0.0.0-20220819030929-7fc1605a5dde
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/gorm v1.23.6
 )

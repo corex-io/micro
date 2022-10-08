@@ -65,7 +65,7 @@ func (my *DB) SetMaxOpenConns(max int) error {
 		return err
 	}
 	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
-	db.SetMaxIdleConns(100)
+	db.SetMaxIdleConns(max)
 
 	// SetMaxOpenConns sets the maximum number of open connections to the database.
 	db.SetMaxOpenConns(max)

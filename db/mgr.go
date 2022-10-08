@@ -66,17 +66,12 @@ func Load(config Config) error {
 	return mgr.Load(config)
 }
 
-// Get Get
-func Get(uuid string) *DB {
-	return mgr.Get(uuid)
-}
-
 // GetDB GetDB
 func GetDB(ctx context.Context, uuid string) *gorm.DB {
 	return mgr.Get(uuid).DB(ctx)
 }
 
-// Close close
+// Close connection
 func Close() error {
 	for _, db := range mgr.dbs {
 		db.Close()
