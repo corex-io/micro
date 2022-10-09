@@ -48,7 +48,7 @@ func New(driver, dsn string) (*DB, error) {
 	return WithDB(db), nil
 }
 
-// Close close connection
+// Close connection
 func (my *DB) Close() error {
 	return nil
 }
