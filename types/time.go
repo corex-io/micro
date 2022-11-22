@@ -3,8 +3,8 @@ package types
 import (
 	"database/sql/driver"
 	"fmt"
-	"sync"
 	"time"
+	"unsafe"
 )
 
 // Since returns the time elapsed since t. It is shorthand for time.Now().Sub(t).
@@ -17,26 +17,17 @@ func Until(t *Time) time.Duration {
 	return t.Time().Sub(Now().Time())
 }
 
-var timeFormat = `"2006-01-02 15:04:05.000"`
+var timeFormat = `"2006-01-02 15:04:05"`
 
-var once sync.Once
-
-// ResetTimeFormat reset timeFormat
-func ResetTimeFormat(timeFormat string) {
-	once.Do(func() {
-		timeFormat = fmt.Sprintf(`"%s"`, timeFormat)
-	})
-}
-
-// Time 2006-01-02 15:04:05
+// Time time: 2006-01-02 15:04:05
 type Time time.Time
 
-// Now return now time
+// Now current time
 func Now() *Time {
 	return NewTime(time.Now())
 }
 
-// NewTime newTime
+// NewTime new Time
 func NewTime(t time.Time, layout ...string) *Time {
 	ts := Time(t)
 	return &ts
@@ -182,28 +173,18 @@ func (t Time) Location() *time.Location {
 
 // String returns the time formatted using the format string
 func (t Time) String() string {
-	return t.Time().Format("2006-01-02 15:04:05.000")
+	return t.Time().Format("2006-01-02 15:04:05")
 }
 
 // UnmarshalJSON unmarshaler interface
-func (t *Time) UnmarshalJSON(data []byte) error {
-	s := string(data)
-	if s == "null" {
+func (t *Time) UnmarshalJSON(b []byte) error {
+	s := *(*string)(unsafe.Pointer(&b))
+	if s == "null" || s == `""` {
 		*t = Time{}
 		return nil
 	}
-
 	now, err := time.ParseInLocation(timeFormat, s, time.Local)
-	if err == nil {
-		*t = Time(now)
-		return nil
-	}
-
-	now, err = time.ParseInLocation(`"2006-01-02 15:04:05"`, s, time.Local)
-	if err == nil {
-		*t = Time(now)
-		return nil
-	}
+	*t = Time(now)
 	return err
 }
 
