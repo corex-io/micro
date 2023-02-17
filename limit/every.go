@@ -13,7 +13,7 @@ var StopErr = errors.New("stop limit.Every")
 // Every every
 type Every struct {
 	duration time.Duration
-	f func(ctx context.Context) error
+	f        func(ctx context.Context) error
 	stop     chan error
 }
 
@@ -21,10 +21,11 @@ type Every struct {
 func NewEvery(duration time.Duration, f func(ctx context.Context) error) *Every {
 	return &Every{
 		duration: duration,
-		f: f,
+		f:        f,
 		stop:     make(chan error),
 	}
 }
+
 // Stop stop
 func (v *Every) Stop(err error) {
 	v.stop <- err
@@ -39,14 +40,14 @@ func (v *Every) Run(ctx context.Context) error {
 		case <-t.C:
 			if err := v.f(ctx); err != nil {
 				if errors.Is(err, StopErr) {
-					return err
+					return nil
 				}
-				log.Errorf("%s", err)
+				log.Warnf("every: %s", err)
 			}
 			t.Reset(v.duration)
 		case <-ctx.Done():
 			return ctx.Err()
-		case err :=<-v.stop:
+		case err := <-v.stop:
 			return err
 		}
 	}
@@ -68,12 +69,12 @@ func (v *Every) Sched(ctx context.Context) error {
 			}
 		case <-ctx.Done():
 			return ctx.Err()
-		case err :=<-v.stop:
+		case err := <-v.stop:
 			return err
 		}
 	}
 }
 
-func (v Every) Name() string{
+func (v Every) Name() string {
 	return "Every"
 }
