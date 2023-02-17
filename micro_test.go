@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/corex-io/micro/datatypes"
 	"github.com/corex-io/micro/log"
-	"github.com/corex-io/micro/types"
 )
 
 func TestService(t *testing.T) {
@@ -19,7 +19,7 @@ func TestService(t *testing.T) {
 			case <-ctx.Done():
 				return ctx.Err()
 			default:
-				log.Infof("%s", types.Now())
+				log.Infof("%s", datatypes.Now())
 				time.Sleep(1 * time.Second)
 			}
 		}
