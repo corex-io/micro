@@ -13,8 +13,9 @@ var StopErr = errors.New("stop limit.Every")
 // Every every
 type Every struct {
 	wait time.Duration
-	f    func(ctx context.Context) error
-	st   func(ctx context.Context) error
+	f    func(context.Context) error
+	st   func(context.Context) error
+	exit func(error) bool
 }
 
 // NewEvery newEvery
@@ -25,12 +26,18 @@ func NewEvery(wait time.Duration, f func(ctx context.Context) error) *Every {
 	}
 }
 
-func (v *Every) Sentry(f func(ctx context.Context) error) {
+func (v *Every) Sentry(f func(ctx context.Context) error) *Every {
 	v.st = f
+	return v
+}
+
+func (v *Every) Exit(f func(error) bool) *Every {
+	v.exit = f
+	return v
 }
 
 // Run 每隔every秒开始执行下一次，如果一次任务的运行时长超过了every，那么下一次直接发起
-func (v *Every) Sched(ctx context.Context, exit func(error) bool) error {
+func (v *Every) Sched(ctx context.Context) error {
 	group, ctx := errgroup.WithContext(ctx)
 	defer group.Wait()
 	if v.st != nil {
@@ -44,7 +51,7 @@ func (v *Every) Sched(ctx context.Context, exit func(error) bool) error {
 	for {
 		select {
 		case <-t.C:
-			if err := v.f(ctx); exit(err) {
+			if err := v.f(ctx); v.exit != nil && v.exit(err) {
 				return err
 			}
 			t.Reset(v.wait)
