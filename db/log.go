@@ -60,7 +60,7 @@ func (log *dbLog) Trace(ctx context.Context, begin time.Time, fc func() (string,
 	_, file, line, _ := runtime.Caller(log.Deepth)
 	switch {
 	case err != nil && log.Lv >= gormLogger.Error:
-		ctxLog.Errorf("%s:%d %s, rows=%d, cost=%s, err=%v", path.Base(file), line, sql, rows, time.Since(begin), err)
+		ctxLog.Warnf("%s:%d %s, rows=%d, cost=%s, err=%v", path.Base(file), line, sql, rows, time.Since(begin), err)
 	case elapsed > 200*time.Microsecond && log.Lv >= gormLogger.Warn:
 		ctxLog.Warnf("%s:%d %s, rows=%d, cost=%s", path.Base(file), line, sql, rows, time.Since(begin))
 	case log.Lv >= gormLogger.Info:

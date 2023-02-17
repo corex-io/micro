@@ -1,4 +1,4 @@
-package types
+package datatypes
 
 import (
 	"database/sql/driver"
@@ -22,12 +22,12 @@ var timeFormat = `"2006-01-02 15:04:05"`
 // Time time: 2006-01-02 15:04:05
 type Time time.Time
 
-// Now current time
+// Now now
 func Now() *Time {
 	return NewTime(time.Now())
 }
 
-// NewTime new Time
+// NewTime newTime
 func NewTime(t time.Time, layout ...string) *Time {
 	ts := Time(t)
 	return &ts
