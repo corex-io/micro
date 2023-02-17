@@ -37,7 +37,7 @@ func (v *Every) Exit(f func(error) bool) *Every {
 }
 
 // Run 每隔every秒开始执行下一次，如果一次任务的运行时长超过了every，那么下一次直接发起
-func (v *Every) Sched(ctx context.Context) error {
+func (v *Every) Run(ctx context.Context) error {
 	group, ctx := errgroup.WithContext(ctx)
 	defer group.Wait()
 	if v.st != nil {
