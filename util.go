@@ -3,8 +3,20 @@ package micro
 import (
 	"fmt"
 	"net"
+	"os"
 	"time"
 )
+
+// IP 本地IP地址
+var IP string
+
+func init() {
+	ip, err := GetLocIp()
+	if err != nil {
+		fmt.Fprintf(os.Stdout, "get LocIpAddr: %v", err)
+	}
+	IP = ip.String()
+}
 
 // GetLocIp get Local ip
 func GetLocIp() (net.IP, error) {

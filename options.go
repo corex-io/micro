@@ -26,12 +26,12 @@ type Options struct {
 type Option func(*Options)
 
 func newOptions(opts ...Option) Options {
-	ip, _ := GetLocIp()
+
 	opt := Options{
 		AppName: path.Base(os.Args[0]),
 		PID:     os.Getpid(),
 		Uptime:  time.Now(),
-		LocIP:   ip.String(),
+		LocIP:   IP,
 		Context: context.Background(),
 	}
 	for _, o := range opts {

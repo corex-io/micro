@@ -37,7 +37,7 @@ func New(driver, dsn string) (*DB, error) {
 	config := &gorm.Config{
 		SkipDefaultTransaction: true,  // 不需要对单次写入操作使用事务
 		PrepareStmt:            false, // 缓存预编译语句
-		Logger:                 &dbLog{Deepth: 5},
+		// Logger:                 &dbLog{Deepth: 5},
 	}
 
 	db, err := gorm.Open(dialector, config)

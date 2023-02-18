@@ -21,8 +21,9 @@ type dbLog struct {
 
 // LogMode implement gorm/logger.Interface
 func (log *dbLog) LogMode(lv gormLogger.LogLevel) gormLogger.Interface {
-	// log.Lv = lv data race
-	return log
+	newlogger := *log
+	newlogger.Lv = lv
+	return &newlogger
 }
 
 // Info implement gorm/logger.Interface
