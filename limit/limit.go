@@ -1,16 +1,15 @@
 package limit
 
 import (
-	"fmt"
 	"sync"
-
-	"github.com/corex-io/micro/log"
 )
 
 // Limit limit
 type Limit struct {
-	ch chan struct{}
-	wg sync.WaitGroup
+	ch   chan struct{}
+	wg   sync.WaitGroup
+	once sync.Once
+	Err  error
 }
 
 // NewLimit newLimit
@@ -30,43 +29,22 @@ func (limit *Limit) Done() {
 	limit.wg.Done()
 }
 
-func (limit *Limit) Go(fc func() error) error {
+func (limit *Limit) Go(fc func() error) {
 	limit.Add(1)
-	go func() error {
-		defer limit.Done()
-		return fc()
-
-	}()
-	return nil
-}
-
-// execute run
-func (limit *Limit) try(fc func() error) error {
-	select {
-	case limit.ch <- struct{}{}:
-		limit.wg.Add(1)
-		defer func() {
-			<-limit.ch
-			limit.wg.Done()
-		}()
-		return fc()
-	default:
-		return fmt.Errorf("limited[%d]", cap(limit.ch))
-	}
-}
-
-// TryGo try run once, if fail exit
-func (limit *Limit) TryGo(key string, fc func() error) {
 	go func() {
-		if err := limit.try(fc); err != nil {
-			log.Errorf("key=%s, %v", key, err.Error())
+		defer limit.Done()
+		if err := fc(); err != nil {
+			limit.once.Do(func() {
+				limit.Err = err
+			})
 		}
 	}()
 }
 
 // Wait wait all groutine close
-func (limit *Limit) Wait() {
+func (limit *Limit) Wait() error {
 	limit.wg.Wait()
+	return limit.Err
 }
 
 // Len len

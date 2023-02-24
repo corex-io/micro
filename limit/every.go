@@ -11,12 +11,12 @@ var StopErr = errors.New("stop limit.Every")
 // Every every
 type Every struct {
 	wait time.Duration
-	fn   func(context.Context) error
+	fn   func() error
 	exit func(error) bool
 }
 
 // NewEvery newEvery
-func NewEvery(wait time.Duration, fn func(ctx context.Context) error) *Every {
+func NewEvery(wait time.Duration, fn func() error) *Every {
 	return &Every{
 		wait: wait,
 		fn:   fn,
@@ -35,7 +35,7 @@ func (v *Every) Run(ctx context.Context) error {
 	for {
 		select {
 		case <-t.C:
-			if err := v.fn(ctx); v.exit != nil && v.exit(err) {
+			if err := v.fn(); v.exit != nil && v.exit(err) {
 				return err
 			}
 			t.Reset(v.wait)
