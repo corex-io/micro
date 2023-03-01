@@ -9,7 +9,7 @@ import (
 type Line []*float64
 
 // PointAt PointAt
-func (line Line) PointAt(startAt *Time, index, period int) *Time {
+func (v Line) PointAt(startAt *Time, index, period int) *Time {
 	return startAt.Add(time.Duration(index*period) * time.Second)
 }
 
@@ -17,6 +17,16 @@ func (line Line) PointAt(startAt *Time, index, period int) *Time {
 func (v Line) String() string {
 	b, _ := json.Marshal(v)
 	return string(b)
+}
+
+func (v Line) Cut() Line {
+	var pos int
+	for i := len(v) - 1; i >= 0; i-- {
+		if v[i] == nil {
+			pos = i
+		}
+	}
+	return v[:pos]
 }
 
 // RangeMatch 设置一个条件, 统计连续满足改条件的数据范围取值有哪些
