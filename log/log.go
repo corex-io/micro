@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"runtime/debug"
 	"strings"
 	"time"
@@ -14,7 +13,7 @@ import (
 
 type kv struct {
 	key   string
-	value interface{}
+	value any
 }
 
 // Log log
@@ -82,13 +81,13 @@ func (log *Log) WithValues(key string, value interface{}) *Log {
 
 func (log *Log) outputLine(lv, format string, v ...interface{}) string {
 	var msg []string
-	_, fileName, no, _ := runtime.Caller(4)
+	fpath, no := call()
 
 	msg = append(msg, fmt.Sprintf("%s[%s][%s][%s:%d]",
 		lv,
 		time.Now().Format(log.options.timeFormat),
 		log.name,
-		filepath.Base(fileName), no,
+		filepath.Base(fpath), no,
 	))
 	for _, kv := range log.head {
 		msg = append(msg, fmt.Sprintf("%s=%v", kv.key, kv.value))
@@ -98,15 +97,15 @@ func (log *Log) outputLine(lv, format string, v ...interface{}) string {
 }
 
 type jsonLog struct {
-	LogAt  string                 `json:"LogAt"`
-	Name   string                 `json:"Name"`
-	Lv     string                 `json:"Lv"`
-	Fields map[string]interface{} `json:"Fields,omitempty"`
-	Msg    string                 `json:"Msg,omitempty"`
+	LogAt  string         `json:"LogAt"`
+	Name   string         `json:"Name"`
+	Lv     string         `json:"Lv"`
+	Fields map[string]any `json:"Fields,omitempty"`
+	Msg    string         `json:"Msg,omitempty"`
 }
 
-func (log *Log) outputJSON(lv, format string, v ...interface{}) string {
-	fields := make(map[string]interface{}, len(log.head))
+func (log *Log) outputJSON(lv, format string, v ...any) string {
+	fields := make(map[string]any, len(log.head))
 	for _, kv := range log.head {
 		fields[kv.key] = kv.value
 	}
@@ -122,7 +121,7 @@ func (log *Log) outputJSON(lv, format string, v ...interface{}) string {
 	return string(msg)
 }
 
-func (log *Log) output(lv, format string, v ...interface{}) {
+func (log *Log) output(lv, format string, v ...any) {
 	var msg string
 	switch log.options.msgFormat {
 	case "json", "JSON":
@@ -130,7 +129,7 @@ func (log *Log) output(lv, format string, v ...interface{}) {
 	default:
 		msg = log.outputLine(lv, format, v...)
 	}
-	fmt.Fprintln(log.w, msg)
+	_, _ = fmt.Fprintln(log.w, msg)
 }
 
 // Close close
@@ -142,22 +141,22 @@ func (log *Log) Close() error {
 }
 
 // Debugf debugf
-func (log *Log) Debugf(format string, v ...interface{}) {
+func (log *Log) Debugf(format string, v ...any) {
 	log.output("D", format, v...)
 }
 
 // Infof Infof
-func (log *Log) Infof(format string, v ...interface{}) {
+func (log *Log) Infof(format string, v ...any) {
 	log.output("I", format, v...)
 }
 
 // Warnf Warnf
-func (log *Log) Warnf(format string, v ...interface{}) {
+func (log *Log) Warnf(format string, v ...any) {
 	log.output("W", format, v...)
 }
 
 // Errorf Errorf
-func (log *Log) Errorf(format string, v ...interface{}) {
+func (log *Log) Errorf(format string, v ...any) {
 	log.output("E", format, v...)
 	debug.PrintStack()
 }
