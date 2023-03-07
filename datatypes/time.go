@@ -62,13 +62,17 @@ func ParseInLocation(layout, value string, loc *time.Location) (*Time, error) {
 	return NewTime(ts), nil
 }
 
+func FromTimestamp(ts int64) *Time {
+	return NewTime(time.Unix(ts/1000, (ts%1000)*int64(time.Millisecond)).UTC())
+}
+
 // Date returns the Time corresponding to
 func Date(year int, month time.Month, day, hour, min, sec, nsec int, loc *time.Location) *Time {
 	return NewTime(time.Date(year, month, day, hour, min, sec, nsec, loc))
 }
 
 // Add returns the time t+d.
-func (t Time) Add(d time.Duration) *Time {
+func (t *Time) Add(d time.Duration) *Time {
 	return NewTime(t.Time().Add(d))
 }
 
@@ -76,32 +80,32 @@ func (t Time) Add(d time.Duration) *Time {
 // For example, AddDate(-1, 2, 3) applied to January 1, 2011 returns March 4, 2010.
 // AddDate normalizes its result in the same way that Date does, so,
 // for example, adding one month to October 31 yields December 1, the normalized form for November 31.
-func (t Time) AddDate(years int, months int, days int) *Time {
+func (t *Time) AddDate(years int, months int, days int) *Time {
 	return NewTime(t.Time().AddDate(years, months, days))
 }
 
 // After reports whether the time instant t is after u.
-func (t Time) After(u *Time) bool {
+func (t *Time) After(u *Time) bool {
 	return t.Time().After(u.Time())
 }
 
 // Before reports whether the time instant t is before u.
-func (t Time) Before(u *Time) bool {
+func (t *Time) Before(u *Time) bool {
 	return t.Time().Before(u.Time())
 }
 
 // Clock returns the hour, minute, and second within the day specified by t.
-func (t Time) Clock() (hour, min, sec int) {
+func (t *Time) Clock() (hour, min, sec int) {
 	return t.Time().Clock()
 }
 
 // Date returns the year, month, and day in which t occurs.
-func (t Time) Date() (year int, month time.Month, day int) {
+func (t *Time) Date() (year int, month time.Month, day int) {
 	return t.Time().Date()
 }
 
 // Day returns the day of the month specified by t.
-func (t Time) Day() int {
+func (t *Time) Day() int {
 	return t.Time().Day()
 }
 
@@ -110,69 +114,69 @@ func (t Time) Day() int {
 // For example, 6:00 +0200 and 4:00 UTC are Equal.
 // See the documentation on the Time type for the pitfalls of using == with Time values;
 // most code should use Equal instead.
-func (t Time) Equal(u *Time) bool {
+func (t *Time) Equal(u *Time) bool {
 	return t.Time().Equal(u.Time())
 }
 
 // Format returns a textual representation of the time value formatted according to layout,
 // which defines the format by showing how the reference time, defined to be
-func (t Time) Format(layout string) string {
+func (t *Time) Format(layout string) string {
 	return t.Time().Format(layout)
 }
 
 // Hour returns the hour within the day specified by t, in the range [0, 23].
-func (t Time) Hour() int {
+func (t *Time) Hour() int {
 	return t.Time().Hour()
 }
 
 // IsZero isZero
-func (t Time) IsZero() bool {
+func (t *Time) IsZero() bool {
 	return t.Time().IsZero()
 }
 
 // Minute returns the minute offset within the hour specified by t, in the range [0, 59].
-func (t Time) Minute() int {
+func (t *Time) Minute() int {
 	return t.Time().Minute()
 }
 
 // Month returns the month of the year specified by t.
-func (t Time) Month() time.Month {
+func (t *Time) Month() time.Month {
 	return t.Time().Month()
 }
 
 // Nanosecond returns the nanosecond offset within the second specified by t, in the range [0, 999999999].
-func (t Time) Nanosecond() int {
+func (t *Time) Nanosecond() int {
 	return t.Time().Nanosecond()
 }
 
 // Second returns the second offset within the minute specified by t, in the range [0, 59].
-func (t Time) Second() int {
+func (t *Time) Second() int {
 	return t.Time().Second()
 }
 
 // Sub returns the duration t-u. If the result exceeds the maximum (or minimum) value that can be stored in a Duration,
 // the maximum (or minimum) duration will be returned. To compute t-d for a duration d, use t.Add(-d).
-func (t Time) Sub(u *Time) time.Duration {
+func (t *Time) Sub(u *Time) time.Duration {
 	return t.Time().Sub(u.Time())
 }
 
 // Year returns the year in which t occurs.
-func (t Time) Year() int {
+func (t *Time) Year() int {
 	return t.Time().Year()
 }
 
 // Weekday returns the day of the week specified by t.
-func (t Time) Weekday() time.Weekday {
+func (t *Time) Weekday() time.Weekday {
 	return t.Time().Weekday()
 }
 
 // Location returns the time zone information associated with t.
-func (t Time) Location() *time.Location {
+func (t *Time) Location() *time.Location {
 	return t.Time().Location()
 }
 
 // String returns the time formatted using the format string
-func (t Time) String() string {
+func (t *Time) String() string {
 	return t.Time().Format("2006-01-02 15:04:05")
 }
 
@@ -189,7 +193,7 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON marshaler interface
-func (t Time) MarshalJSON() ([]byte, error) {
+func (t *Time) MarshalJSON() ([]byte, error) {
 	if t.Time().IsZero() {
 		return []byte("null"), nil
 	}
@@ -198,7 +202,7 @@ func (t Time) MarshalJSON() ([]byte, error) {
 }
 
 // Value return json value, implement driver.Valuer interface
-func (t Time) Value() (driver.Value, error) {
+func (t *Time) Value() (driver.Value, error) {
 	if t.IsZero() {
 		return nil, nil
 	}
@@ -217,6 +221,16 @@ func (t *Time) Scan(v interface{}) error {
 }
 
 // Time time
-func (t Time) Time() time.Time {
-	return time.Time(t)
+func (t *Time) Time() time.Time {
+	return time.Time(*t)
+}
+
+// Unix unix
+func (t *Time) Unix() int64 {
+	return t.Time().Unix()
+}
+
+// Timestamp returns a new millisecond timestamp from a time.
+func (t *Time) Timestamp() int64 {
+	return t.Unix()*1000 + int64(t.Nanosecond())/int64(time.Millisecond)
 }

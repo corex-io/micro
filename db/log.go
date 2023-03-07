@@ -43,7 +43,7 @@ func (log *dbLog) Warn(ctx context.Context, msg string, v ...interface{}) {
 // Error implement gorm/logger.Interface
 func (log *dbLog) Error(ctx context.Context, msg string, v ...interface{}) {
 	if log.Lv >= gormLogger.Error {
-		ctxLog.Errorf(msg, v)
+		ctxLog.Errorf(msg, v...)
 	}
 }
 

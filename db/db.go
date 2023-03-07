@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/corex-io/codec"
+	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -30,6 +31,8 @@ func New(driver, dsn string) (*DB, error) {
 	switch driver {
 	case "mysql":
 		dialector = mysql.Open(dsn)
+	case "clickhouse":
+		dialector = clickhouse.Open(dsn)
 	default:
 		return nil, fmt.Errorf("driver=%s is invalid", driver)
 	}
