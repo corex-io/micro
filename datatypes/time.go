@@ -194,7 +194,7 @@ func (t *Time) UnmarshalJSON(b []byte) error {
 
 // MarshalJSON marshaler interface
 func (t *Time) MarshalJSON() ([]byte, error) {
-	if t.Time().IsZero() {
+	if t == nil || t.Time().IsZero() {
 		return []byte("null"), nil
 	}
 	s := t.Time().Format(timeFormat)
@@ -203,7 +203,7 @@ func (t *Time) MarshalJSON() ([]byte, error) {
 
 // Value return json value, implement driver.Valuer interface
 func (t *Time) Value() (driver.Value, error) {
-	if t.IsZero() {
+	if t == nil || t.IsZero() {
 		return nil, nil
 	}
 	// return t.Time().Format("2006-01-02 15:04:05"), nil
