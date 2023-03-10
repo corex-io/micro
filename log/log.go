@@ -81,7 +81,7 @@ func (log *Log) WithValues(key string, value interface{}) *Log {
 
 func (log *Log) outputLine(lv, format string, v ...interface{}) string {
 	var msg []string
-	fpath, no := call()
+	fpath, no := Caller()
 
 	msg = append(msg, fmt.Sprintf("%s[%s][%s][%s:%d]",
 		lv,
