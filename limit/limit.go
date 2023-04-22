@@ -9,13 +9,14 @@ type Limit struct {
 	ch   chan struct{}
 	wg   sync.WaitGroup
 	once sync.Once
-	Err  error
+	Err  chan error
 }
 
 // NewLimit newLimit
 func NewLimit(max int) *Limit {
 	return &Limit{
-		ch: make(chan struct{}, max),
+		ch:  make(chan struct{}, max),
+		Err: make(chan error, max),
 	}
 }
 
@@ -34,9 +35,10 @@ func (limit *Limit) Go(fc func() error) {
 	go func() {
 		defer limit.Done()
 		if err := fc(); err != nil {
-			limit.once.Do(func() {
-				limit.Err = err
-			})
+			select {
+			case limit.Err <- err:
+			default:
+			}
 		}
 	}()
 }
@@ -44,7 +46,12 @@ func (limit *Limit) Go(fc func() error) {
 // Wait wait all groutine close
 func (limit *Limit) Wait() error {
 	limit.wg.Wait()
-	return limit.Err
+	select {
+	case err := <-limit.Err:
+		return err
+	default:
+		return nil
+	}
 }
 
 // Len len

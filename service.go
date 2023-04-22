@@ -18,12 +18,14 @@ import (
 
 // service
 type service struct {
-	services []Runnable
-	options  Options
-	once     sync.Once
+	options Options
+	once    sync.Once
 
 	ctx    context.Context
 	cancel context.CancelFunc
+
+	init     []Runnable
+	services []Runnable
 }
 
 // newService
