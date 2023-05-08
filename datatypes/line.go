@@ -28,17 +28,21 @@ func (v Line) String() string {
 	return string(b)
 }
 
+// Cut 去除尾部的无效值，check函数判断是否有效，有效=true，无效=false
 func (v Line) Cut(check func(v *float64) bool) Line {
-	var pos int
-	for i := len(v) - 1; i >= 0; i-- {
+	pos := len(v)
+	for i := pos - 1; i >= 0; i-- {
 		if check(v[i]) {
-			pos = i
+			break
 		}
+		pos = i
+
 	}
 	return v[:pos]
 }
 
 // RangeMatch 设置一个条件, 统计连续满足改条件的数据范围取值有哪些
+// check函数判断是否有效，有效=true，无效=false
 // minRange int 最小的持续区间
 func (v Line) RangeMatch(check func(v *float64) bool, minRange int) [][]int {
 	s, e, max, ret := 0, 0, len(v), make([][]int, 0, 0)
