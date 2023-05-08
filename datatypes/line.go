@@ -8,6 +8,15 @@ import (
 // Line Line
 type Line []*float64
 
+func NewLine(p ...float64) Line {
+	var v Line
+	for _, c := range p {
+		c := c
+		v = append(v, &c)
+	}
+	return v
+}
+
 // PointAt PointAt
 func (v Line) PointAt(startAt *Time, index, period int) *Time {
 	return startAt.Add(time.Duration(index*period) * time.Second)
@@ -19,10 +28,10 @@ func (v Line) String() string {
 	return string(b)
 }
 
-func (v Line) Cut() Line {
+func (v Line) Cut(check func(v *float64) bool) Line {
 	var pos int
 	for i := len(v) - 1; i >= 0; i-- {
-		if v[i] == nil {
+		if check(v[i]) {
 			pos = i
 		}
 	}
@@ -31,25 +40,20 @@ func (v Line) Cut() Line {
 
 // RangeMatch 设置一个条件, 统计连续满足改条件的数据范围取值有哪些
 // minRange int 最小的持续区间
-func (v Line) RangeMatch(f func(v *float64) bool, minRange int) [][]int {
-	s, e, k := 0, 0, "s"
-	var ret [][]int
-	for i, x := range v {
-		if f(x) && k == "s" {
-			s = i
-			k = "e"
-		} else if f(x) && k == "e" {
-			e = i
-		} else {
-			if e != 0 && e-s >= minRange {
-				ret = append(ret, []int{s, e})
-			}
-			s, e, k = 0, 0, "s"
+func (v Line) RangeMatch(check func(v *float64) bool, minRange int) [][]int {
+	s, e, max, ret := 0, 0, len(v), make([][]int, 0, 0)
+	for e < max {
+		for e < max && !check(v[e]) {
+			e++
+		}
+		s = e
+		for e < max && check(v[e]) {
+			e++
+		}
+
+		if e-s >= minRange {
+			ret = append(ret, []int{s, e})
 		}
 	}
 	return ret
-}
-
-func (v Line) RangeMatchCount(f func(v *float64) bool, minRange int) int {
-	return len(v.RangeMatch(f, minRange))
 }
