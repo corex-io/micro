@@ -76,6 +76,11 @@ func (t *Time) Add(d time.Duration) *Time {
 	return NewTime(t.Time().Add(d))
 }
 
+// UTC returns t with the location set to UTC.
+func (t *Time) UTC() *Time {
+	return NewTime(t.Time().UTC())
+}
+
 // AddDate returns the time corresponding to adding the given number of years, months, and days to t.
 // For example, AddDate(-1, 2, 3) applied to January 1, 2011 returns March 4, 2010.
 // AddDate normalizes its result in the same way that Date does, so,
