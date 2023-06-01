@@ -239,3 +239,13 @@ func (t *Time) Unix() int64 {
 func (t *Time) Timestamp() int64 {
 	return t.Unix()*1000 + int64(t.Nanosecond())/int64(time.Millisecond)
 }
+
+// MarshalBinary implement encoding.BinaryMarshaler.
+func (t *Time) MarshalBinary() ([]byte, error) {
+	return t.MarshalJSON()
+}
+
+// UnmarshalBinary implement encoding.BinaryUnmarshaler.
+func (t *Time) UnmarshalBinary(b []byte) error {
+	return t.UnmarshalJSON(b)
+}
