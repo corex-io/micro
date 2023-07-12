@@ -27,6 +27,15 @@ func (s *Set) Append(vs ...string) *Set {
 	return s
 }
 
+func (s *Set) Remove(vs ...string) *Set {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	for _, v := range vs {
+		delete(s.m, v)
+	}
+	return s
+}
+
 // Len len
 func (s *Set) Len() int {
 	s.mux.RLock()
