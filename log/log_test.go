@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"time"
 )
 
 func Test_Log(t *testing.T) {
@@ -37,4 +38,18 @@ func Test_Appender(t *testing.T) {
 	SetWriter(f)
 	Debugf("debug")
 
+}
+
+func Test_Rotate(t *testing.T) {
+	r, err := NewRotate("log/cc.log.2006-01-02_15.04.05", time.Minute)
+	if err != nil {
+		t.Logf("%v", err)
+		return
+	}
+	l := SetWriter(r)
+	for {
+		time.Sleep(1 * time.Second)
+		l.Debugf("%v", time.Now())
+	}
+	select {}
 }

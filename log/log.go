@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"runtime/debug"
 	"strings"
@@ -32,20 +31,6 @@ func NewLog(name string, writer io.Writer, opts ...Option) *Log {
 		name:    name,
 		w:       writer,
 	}
-}
-
-// WithFile withfile
-// 尝试创建新文件记录日志, 如果失败的话记录回上一个
-func (log *Log) WithFile(elem ...string) *Log {
-
-	f, err := os.OpenFile(filepath.Join(elem...), os.O_APPEND|os.O_CREATE|os.O_WRONLY|os.O_SYNC, 0400)
-	if err != nil {
-		log.Errorf("WithFile: %v", err)
-		return log
-	}
-
-	return log.SetWriter(f)
-
 }
 
 // SetWriter set writer

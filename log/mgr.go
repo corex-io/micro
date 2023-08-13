@@ -36,11 +36,6 @@ func Get(name string) *Log {
 	return mgr.m[name]
 }
 
-// WithFile withFile
-func WithFile(elem ...string) *Log {
-	return Get("_").WithFile(elem...)
-}
-
 // SetWriter setwriter
 func SetWriter(w io.Writer) *Log {
 	return Get("_").SetWriter(w)

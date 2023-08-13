@@ -19,6 +19,13 @@ func Until(t *Time) time.Duration {
 
 var timeFormat = `"2006-01-02 15:04:05"`
 
+const (
+	Day   = 24 * time.Hour
+	Week  = 7 * Day
+	Month = 30 * Day
+	Year  = 365 * Day
+)
+
 // Time time: 2006-01-02 15:04:05
 type Time time.Time
 
@@ -248,4 +255,20 @@ func (t *Time) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary implement encoding.BinaryUnmarshaler.
 func (t *Time) UnmarshalBinary(b []byte) error {
 	return t.UnmarshalJSON(b)
+}
+
+// Truncate returns a new time with the time truncated to the given number of seconds.
+func (t *Time) Truncate(d time.Duration) *Time {
+	if d/Year > 0 {
+		return Date(t.Year(), time.January, 1, 0, 0, 0, 0, time.Local)
+	} else if d/Month > 0 {
+		return Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.Local)
+	} else if d/Day > 0 {
+		return Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.Local)
+	} else if d/time.Hour > 0 {
+		return Date(t.Year(), t.Month(), t.Day(), t.Hour(), 0, 0, 0, time.Local)
+	} else if d/time.Minute > 0 {
+		return Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), 0, 0, time.Local)
+	}
+	return t
 }

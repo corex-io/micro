@@ -40,3 +40,9 @@ func TestTime(t *testing.T) {
 	fmt.Printf("Zero: %s\n", cc)
 
 }
+
+func TestTime_Truncate(t *testing.T) {
+	now := Now()
+	truncated := now.Truncate(time.Hour)
+	fmt.Printf("%s\n", truncated)
+}
