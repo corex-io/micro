@@ -41,7 +41,7 @@ func NewTime(t time.Time, layout ...string) *Time {
 }
 
 // Parse parses a formatted string and returns the time value it represents.
-// The layout defines the format by showing how the reference time, defined to be
+// The layout defines the format by showing )how the reference time, defined to be
 func Parse(layout, value string) (*Time, error) {
 	if layout == "" {
 		layout = timeFormat
@@ -248,7 +248,7 @@ func (t *Time) Timestamp() int64 {
 }
 
 // MarshalBinary implement encoding.BinaryMarshaler.
-func (t *Time) MarshalBinary() ([]byte, error) {
+func (t Time) MarshalBinary() ([]byte, error) {
 	return t.MarshalJSON()
 }
 
