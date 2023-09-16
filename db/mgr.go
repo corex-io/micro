@@ -33,7 +33,7 @@ func (mgr *dbmgr) Load(configs ...Config) error {
 		if err != nil {
 			return err
 		}
-		if err := db.SetMaxOpenConns(200); err != nil {
+		if err := db.SetMaxOpenConns(400); err != nil {
 			return err
 		}
 		mgr.dbs[config.UUID] = db
@@ -64,6 +64,10 @@ func init() {
 // Load Load
 func Load(config Config) error {
 	return mgr.Load(config)
+}
+
+func Get(uuid string) *DB {
+	return mgr.Get(uuid)
 }
 
 // GetDB GetDB

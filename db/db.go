@@ -3,11 +3,10 @@ package db
 import (
 	"context"
 	"fmt"
-	"time"
-
 	"gorm.io/driver/clickhouse"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"time"
 )
 
 // DB my
@@ -22,7 +21,7 @@ func WithDB(db *gorm.DB) *DB {
 }
 
 // New new
-func New(driver, dsn string) (*DB, error) {
+func New(driver, dsn string, opts ...Option) (*DB, error) {
 	ctxLog.Infof("connect: %s %s", driver, dsn)
 
 	var dialector gorm.Dialector
@@ -45,7 +44,6 @@ func New(driver, dsn string) (*DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("connect DB fail, dsn=%s, err=%w", dsn, err)
 	}
-
 	return WithDB(db), nil
 }
 
