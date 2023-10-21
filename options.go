@@ -13,11 +13,6 @@ type Options struct {
 	PID     int    // 进程ID
 	LocIP   string // 地IP
 	Uptime  time.Time
-	// Log      LogProvider
-	// services []Runnable
-	// prepare func(context.Context) error
-	// main    func(context.Context) error
-	// exit    func(context.Context) error
 
 	Context context.Context
 }

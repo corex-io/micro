@@ -3,6 +3,7 @@ package micro
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"os/signal"
@@ -21,8 +22,8 @@ type service struct {
 	options Options
 	once    sync.Once
 
-	ctx    context.Context
-	cancel context.CancelFunc
+	ctx   context.Context
+	cause context.CancelCauseFunc
 
 	init     []Runnable
 	services []Runnable
@@ -36,7 +37,7 @@ func newService(opts ...Option) *service {
 	return svc
 }
 
-// Init init
+// Prepare Init init
 func (s *service) Prepare(opts ...Option) {
 	for _, o := range opts {
 		o(&s.options)
@@ -46,7 +47,7 @@ func (s *service) Prepare(opts ...Option) {
 	})
 }
 
-// Name Name
+// Name xx
 func (s *service) Name() string {
 	return s.options.AppName
 }
@@ -68,9 +69,8 @@ func (s *service) run() error {
 	log.Infof("name=%s, pid=%d, ip=%s", s.options.AppName, s.options.PID, s.options.LocIP)
 
 	var group *errgroup.Group
-	s.ctx, s.cancel = context.WithCancel(context.Background())
+	s.ctx, s.cause = context.WithCancelCause(context.Background())
 	group, s.ctx = errgroup.WithContext(s.ctx)
-	defer s.cancel()
 	go s.notify()
 
 	// if s.init != nil {
@@ -119,7 +119,6 @@ func (s *service) run() error {
 
 // notify
 func (s *service) notify() {
-	defer s.cancel()
 	ignore := make(chan os.Signal, 1)
 	sign := make(chan os.Signal, 1)
 
@@ -128,11 +127,11 @@ func (s *service) notify() {
 
 	select {
 	case <-s.ctx.Done():
-		log.Errorf("got ctx.Err=%v", s.ctx.Err())
+		s.cause(s.ctx.Err())
 	case sig := <-sign:
-		log.Warnf("got sign: %v", sig)
+		s.cause(fmt.Errorf("got sign: %s", sig))
 	}
-	log.Warnf("Waiting all grountine closed")
+	log.Warnf("waiting all grountine closed")
 }
 
 // Regist regist
@@ -144,29 +143,3 @@ func (s *service) Regist(runnable Runnable) {
 func (s *service) RegistFunc(runFunc RunFunc) {
 	s.services = append(s.services, runFunc)
 }
-
-// RegistLoop loop runnable
-//func (s *service) RegistLoop(duration time.Duration, runnable Runnable) {
-//	every := limit.NewEvery(duration, runnable.Run)
-//	s.services = append(s.services, every)
-//}
-//
-//// RegistLoopFunc loop func
-//func (s *service) RegistLoopFunc(duration time.Duration, runFunc RunFunc) {
-//	every := limit.NewEvery(duration, runFunc)
-//	s.services = append(s.services, every)
-//}
-
-// PrepareFunc preparefunc
-// func (s *service) Init(init Init) {
-// 	if s.init == nil {
-// 		s.init = init
-// 	}
-// }
-
-// // Prepare prepare
-// func (s *service) InitFunc(initFunc InitFunc) {
-// 	if s.init == nil {
-// 		s.init = initFunc
-// 	}
-// }

@@ -4,16 +4,13 @@ package micro
 // within go-micro. Its a convenience method for building
 // and initialising services.
 type Service interface {
-	// The service name
+	// Name The service name
 	Name() string
-	// prepare initialises options
+	// Prepare prepare initialises options
 	Prepare(...Option)
 	// Options returns the current options
 	Options() Options
-	// Client is used to call services
-	// Client() client.Client
-	// Server is for handling requests and events
-	// Server() server.Server
+
 	// Run the service
 	Run() error
 
