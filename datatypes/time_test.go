@@ -46,3 +46,11 @@ func TestTime_Truncate(t *testing.T) {
 	truncated := now.Truncate(time.Hour)
 	fmt.Printf("%s\n", truncated)
 }
+
+func TestTime_IsZero(t *testing.T) {
+	c, err := Parse("", "0000-21-01 00:00:00")
+	t.Logf("%v, err=%v", c, err)
+	z := Time{}
+	err = z.UnmarshalJSON([]byte(`"0000-00-00 00:00:00"`))
+	t.Logf("%v, %v", z, err)
+}

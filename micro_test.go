@@ -11,8 +11,8 @@ import (
 )
 
 func TestService(t *testing.T) {
-	service := New(Name("test"))
-	service.RegistFunc(func(ctx context.Context) error {
+	app := New(Name("test"))
+	app.RegistFunc(func(ctx context.Context) error {
 		fmt.Println("init...")
 		for {
 			select {
@@ -24,7 +24,13 @@ func TestService(t *testing.T) {
 			}
 		}
 	})
-	if err := service.Run(); err != nil {
+	app.RegistFunc(func(ctx context.Context) error {
+		return Pprof(ctx, 10*time.Minute)
+	})
+	app.RegistFunc(func(ctx context.Context) error {
+		return Trace(ctx, 10*time.Minute)
+	})
+	if err := app.Run(); err != nil {
 		t.Error(err)
 	}
 }

@@ -17,7 +17,7 @@ func Until(t *Time) time.Duration {
 	return t.Time().Sub(Now().Time())
 }
 
-var timeFormat = `"2006-01-02 15:04:05"`
+const timeFormat = `"2006-01-02 15:04:05"`
 
 const (
 	Day   = 24 * time.Hour
@@ -43,9 +43,6 @@ func NewTime(t time.Time, layout ...string) *Time {
 // Parse parses a formatted string and returns the time value it represents.
 // The layout defines the format by showing )how the reference time, defined to be
 func Parse(layout, value string) (*Time, error) {
-	if layout == "" {
-		layout = timeFormat
-	}
 	ts, err := time.Parse(layout, value)
 	if err != nil {
 		return nil, err
@@ -59,9 +56,6 @@ func Parse(layout, value string) (*Time, error) {
 // Second, when given a zone offset or abbreviation, Parse tries to match it against the Local location;
 // ParseInLocation uses the given location.
 func ParseInLocation(layout, value string, loc *time.Location) (*Time, error) {
-	if layout == "" {
-		layout = timeFormat
-	}
 	ts, err := time.ParseInLocation(layout, value, loc)
 	if err != nil {
 		return nil, err
@@ -195,7 +189,7 @@ func (t *Time) String() string {
 // UnmarshalJSON unmarshaler interface
 func (t *Time) UnmarshalJSON(b []byte) error {
 	s := *(*string)(unsafe.Pointer(&b))
-	if s == "null" || s == `""` {
+	if s == "null" || s == `""` || s == `"0000-00-00 00:00:00"` {
 		*t = Time{}
 		return nil
 	}
