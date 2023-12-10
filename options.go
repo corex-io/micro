@@ -2,6 +2,7 @@ package micro
 
 import (
 	"context"
+	"github.com/corex-io/micro/common"
 	"os"
 	"path"
 	"time"
@@ -26,7 +27,7 @@ func newOptions(opts ...Option) Options {
 		AppName: path.Base(os.Args[0]),
 		PID:     os.Getpid(),
 		Uptime:  time.Now(),
-		LocIP:   IP,
+		LocIP:   common.IP,
 		Context: context.Background(),
 	}
 	for _, o := range opts {
