@@ -2,15 +2,12 @@ package db
 
 import (
 	"context"
+	"github.com/corex-io/micro/common"
+	"github.com/corex-io/micro/log"
+	gormLogger "gorm.io/gorm/logger"
 	"path"
 	"time"
-
-	"github.com/corex-io/micro/log"
-
-	gormLogger "gorm.io/gorm/logger"
 )
-
-var ctxLog = log.WithName("db")
 
 // Log gormLogger
 type dbLog struct {
@@ -34,21 +31,21 @@ func (l *dbLog) LogMode(lv gormLogger.LogLevel) gormLogger.Interface {
 // Info implement gorm/logger.Interface
 func (l *dbLog) Info(ctx context.Context, msg string, v ...interface{}) {
 	if l.Lv >= gormLogger.Info {
-		l.w.Infof(msg, v...)
+		l.w.WithName(common.GetRequestId(ctx)).Infof(msg, v...)
 	}
 }
 
 // Warn implement gorm/logger.Interface
 func (l *dbLog) Warn(ctx context.Context, msg string, v ...interface{}) {
 	if l.Lv >= gormLogger.Warn {
-		l.w.Warnf(msg, v...)
+		l.w.WithName(common.GetRequestId(ctx)).Warnf(msg, v...)
 	}
 }
 
 // Error implement gorm/logger.Interface
 func (l *dbLog) Error(ctx context.Context, msg string, v ...interface{}) {
 	if l.Lv >= gormLogger.Error {
-		l.w.Errorf(msg, v...)
+		l.w.WithName(common.GetRequestId(ctx)).Errorf(msg, v...)
 	}
 }
 
@@ -66,10 +63,10 @@ func (l *dbLog) Trace(ctx context.Context, begin time.Time, fc func() (string, i
 	file, line := log.Caller("micro/db/db.go", "micro/db/log.go", "micro/db/mgr.go")
 	switch {
 	case err != nil && l.Lv >= gormLogger.Error:
-		l.w.Warnf("%s:%d %s, rows=%d, cost=%s, err=%v", path.Base(file), line, sql, rows, time.Since(begin), err)
+		l.w.WithName(common.GetRequestId(ctx)).Warnf("%s:%d %s, rows=%d, cost=%s, err=%v", path.Base(file), line, sql, rows, time.Since(begin), err)
 	case elapsed > 3000*time.Microsecond && l.Lv >= gormLogger.Warn:
-		l.w.Warnf("%s:%d %s, rows=%d, cost=%s", path.Base(file), line, sql, rows, time.Since(begin))
+		l.w.WithName(common.GetRequestId(ctx)).Warnf("%s:%d %s, rows=%d, cost=%s", path.Base(file), line, sql, rows, time.Since(begin))
 	case l.Lv >= gormLogger.Info:
-		l.w.Infof("%s:%d %s, rows=%d, cost=%s", path.Base(file), line, sql, rows, time.Since(begin))
+		l.w.WithName(common.GetRequestId(ctx)).Infof("%s:%d %s, rows=%d, cost=%s", path.Base(file), line, sql, rows, time.Since(begin))
 	}
 }
