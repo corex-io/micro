@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var ctxLog = log.WithName("db")
+
 // Log gormLogger
 type dbLog struct {
 	Lv gormLogger.LogLevel
