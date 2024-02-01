@@ -75,6 +75,14 @@ func (my *DB) SetMaxOpenConns(max int) error {
 	return nil
 }
 
+func (my *DB) Stream(ctx context.Context, query string, args []any, f func(int64, []any) error) (int64, error) {
+	db, err := my.db.DB()
+	if err != nil {
+		return 0, err
+	}
+	return Stream(ctx, db, query, args, f)
+}
+
 // Model model
 type Model interface {
 	TableName() string

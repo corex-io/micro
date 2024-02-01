@@ -1,14 +1,14 @@
 module github.com/corex-io/micro
 
-go 1.18
+go 1.20
 
 require (
 	github.com/corex-io/codec v0.0.0-20210617135354-fa3f3c955862
-	go.etcd.io/bbolt v1.3.7
-	golang.org/x/sync v0.3.0
+	go.etcd.io/bbolt v1.3.8
+	golang.org/x/sync v0.6.0
 	gorm.io/driver/clickhouse v0.5.0
-	gorm.io/driver/mysql v1.5.1
-	gorm.io/gorm v1.25.4
+	gorm.io/driver/mysql v1.5.2
+	gorm.io/gorm v1.25.6
 )
 
 require (

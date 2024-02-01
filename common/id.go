@@ -24,8 +24,8 @@ func GetRequestId(ctx context.Context) string {
 }
 
 // WithSpanId append SpanId to context
-func WithSpanId(ctx context.Context, sessionId string) context.Context {
-	return context.WithValue(ctx, key("SpanId"), sessionId)
+func WithSpanId(ctx context.Context, spanId string) context.Context {
+	return context.WithValue(ctx, key("SpanId"), spanId)
 }
 
 // GetSpanId GetSpanId
@@ -40,8 +40,17 @@ func GenId(id ...string) string {
 		return id[0]
 	}
 	m.Lock()
-	defer m.Unlock()
-	return strings.ToUpper(strconv.FormatUint(uint64(time.Now().UnixMicro()*1000+source.Int63n(1000)), 16))
+	s := uint64(time.Now().UnixMicro()*1000 + source.Int63n(1000)) // % 4738381338321616895
+	m.Unlock()
+	return strings.ToUpper(strconv.FormatUint(s, 36))
+}
+
+func ParseId(id string) int64 {
+	tsm, err := strconv.ParseUint(id, 36, 64)
+	if err != nil {
+		return 0
+	}
+	return int64(tsm / 1000)
 }
 
 func GenId2() string {
