@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/corex-io/micro/datatypes"
 	"strconv"
+	"strings"
 	"time"
 	"unsafe"
 )
@@ -59,7 +60,7 @@ func format(s, fmt string) (any, error) {
 
 	switch fmt {
 	case "RawBytes", "string":
-		return s, nil
+		return strings.Clone(s), nil
 	case "NullInt64", "uint8", "uint32", "uint64", "int", "int8", "int32", "int64":
 		return strconv.Atoi(s)
 	case "NullTime":
