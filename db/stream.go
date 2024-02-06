@@ -60,7 +60,7 @@ func format(s, fmt string) (any, error) {
 	switch fmt {
 	case "RawBytes", "string":
 		return s, nil
-	case "NullInt64", "uint8", "uint32", "uint64", "int8", "int", "int64":
+	case "NullInt64", "uint8", "uint32", "uint64", "int", "int8", "int32", "int64":
 		return strconv.Atoi(s)
 	case "NullTime":
 		if s == "0001-01-01T00:00:00Z" || s == "" {
