@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/corex-io/micro/datatypes"
 	"strconv"
@@ -39,26 +40,8 @@ func Stream(ctx context.Context, db *sql.DB, query string, args []any, handle fu
 		row := make([]any, len(v), len(v))
 
 		for i := 0; i <= len(v)-1; i++ {
-			if v[i] == nil {
-				continue
-			}
-			switch types[i].ScanType().Name() {
-			case "RawBytes":
-				row[i] = string(v[i]) //*(*string)(unsafe.Pointer(&v[i]))， 这里要深度copy, 以免数据覆盖
-			case "NullInt64", "uint8", "int32", "uint64":
-				if row[i], err = strconv.Atoi(string(v[i])); err != nil {
-					return cnt, pErr(types[i].Name(), types[i].ScanType().Name(), v[i], v, err)
-				}
-			case "NullTime":
-				if *(*string)(unsafe.Pointer(&v[i])) == "0001-01-01T00:00:00Z" {
-					continue
-				}
-				if row[i], err = datatypes.ParseInLocation(timeFormat, string(v[i]), time.Local); err != nil {
-					return cnt, pErr(types[i].Name(), types[i].ScanType().Name(), v[i], v, err)
-				}
-
-			default:
-				return cnt, pErr(types[i].Name(), types[i].ScanType().Name(), v[i], row, nil)
+			if row[i], err = format(*(*string)(unsafe.Pointer(&v[i])), types[i].ScanType().Name()); err != nil {
+				return cnt, pErr(types[i].Name(), types[i].ScanType().Name(), v[i], v, err)
 			}
 		}
 		if err = handle(cnt, row); err != nil {
@@ -70,4 +53,25 @@ func Stream(ctx context.Context, db *sql.DB, query string, args []any, handle fu
 
 func pErr(name, kind string, v sql.RawBytes, row any, err error) error {
 	return fmt.Errorf("name=%s, kind=%s, v=%s, row=%#v, err=%w", name, kind, v, row, err)
+}
+
+func format(s, fmt string) (any, error) {
+
+	switch fmt {
+	case "RawBytes", "string":
+		return s, nil
+	case "NullInt64", "uint8", "uint32", "uint64", "int8", "int", "int64":
+		return strconv.Atoi(s)
+	case "NullTime":
+		if s == "0001-01-01T00:00:00Z" || s == "" {
+			return &time.Time{}, nil
+		}
+		return datatypes.ParseInLocation(timeFormat, s, time.Local)
+	case "float64":
+		return strconv.ParseFloat(s, 64)
+	case "bool":
+		return strconv.ParseBool(s)
+	default:
+		return nil, errors.New("format unknown")
+	}
 }

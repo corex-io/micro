@@ -19,7 +19,7 @@ func TestM_SubSQL(t *testing.T) {
 }
 
 func TestSearch_SQL(t *testing.T) {
-	search := Search{
+	search := SearchBody{
 		Namespace:    "table",
 		ResultColumn: []string{"*"},
 		Condition: []M{
