@@ -42,7 +42,8 @@ func Stream(ctx context.Context, db *sql.DB, query string, args []any, handle fu
 
 		for i := 0; i <= len(v)-1; i++ {
 			if row[i], err = format(*(*string)(unsafe.Pointer(&v[i])), types[i].ScanType().Name()); err != nil {
-				return cnt, pErr(types[i].Name(), types[i].ScanType().Name(), v[i], v, err)
+				//return cnt, pErr(types[i].Name(), types[i].ScanType().Name(), v[i], v, err)
+				fmt.Println(pErr(types[i].Name(), types[i].ScanType().Name(), v[i], v, err))
 			}
 		}
 		if err = handle(cnt, row); err != nil {
